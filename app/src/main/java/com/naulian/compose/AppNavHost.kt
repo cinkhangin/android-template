@@ -1,35 +1,58 @@
 package com.naulian.compose
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
 import com.naulian.compose.home.HomeScreen
-
-val LocalNavController = compositionLocalOf<NavController> {
-    error("NavController not present")
-}
 
 @Composable
 fun AppNavHost() {
-    CompositionLocalProvider(
-        LocalNavController provides rememberNavController()
-    ) {
-        val navController = LocalNavController.current as NavHostController
-        NavHost(
-            navController = navController,
-            startDestination = Screen.Home
-        ) {
-            composable<Screen.Home> {
-                HomeScreen()
+    val backStack = remember { mutableStateListOf<Screen>(Screen.Home) }
+
+    NavDisplay(
+        backStack = backStack,
+        onBack = { backStack.removeLastOrNull() },
+        entryProvider = entryProvider {
+            entry<Screen.Home> {
+                HomeScreen(backStack)
             }
-            composable<Screen.Second> {
-                SecondScreen()
+
+            entry<Screen.Second> {
+                SecondScreen(onBack = { backStack.removeLastOrNull() })
             }
+        },
+        transitionSpec = {
+            slideInHorizontally(
+                initialOffsetX = { it },
+                animationSpec = tween(400)
+            ) togetherWith slideOutHorizontally(
+                targetOffsetX = { -it },
+                animationSpec = tween(400)
+            )
+        },
+        predictivePopTransitionSpec = {
+            slideInHorizontally(
+                initialOffsetX = { -it },
+                animationSpec = tween(400)
+            ) togetherWith slideOutHorizontally(
+                targetOffsetX = { it },
+                animationSpec = tween(400)
+            )
+        },
+        popTransitionSpec = {
+            slideInHorizontally(
+                initialOffsetX = { -it },
+                animationSpec = tween(400)
+            ) togetherWith slideOutHorizontally(
+                targetOffsetX = { it },
+                animationSpec = tween(400)
+            )
         }
-    }
+    )
 }

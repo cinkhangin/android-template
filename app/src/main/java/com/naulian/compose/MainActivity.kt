@@ -11,13 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.naulian.compose.theme.ComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.serialization.Serializable
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -33,14 +28,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun SecondScreen() {
-    val navController = LocalNavController.current
+fun SecondScreen(onBack : () -> Unit = {}) {
     Box(
         modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
-        Button(onClick = {
-            navController.navigateUp()
-        }) {
+        Button(onClick = onBack) {
             Text("Back Home")
         }
     }

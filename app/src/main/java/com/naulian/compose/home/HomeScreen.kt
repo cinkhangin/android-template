@@ -4,14 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.naulian.compose.LocalNavController
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.naulian.compose.Screen
 
 @Composable
-fun HomeScreen() {
-
-    val navController = LocalNavController.current
+fun HomeScreen(backStack: SnapshotStateList<Screen>) {
 
     val viewModel: HomeViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
@@ -19,14 +17,14 @@ fun HomeScreen() {
     LaunchedEffect(Unit) {
         viewModel.event.collect {
             when (it) {
-                HomeEvent.ToSecond -> navController.navigate(Screen.Second)
+                HomeEvent.ToSecond -> backStack.add(Screen.Second)
             }
         }
     }
 
     HomeScreenUI(uiState = state) {
         when (it) {
-            HomeUIEvent.Back -> navController.navigateUp()
+            HomeUIEvent.Back -> backStack.removeLastOrNull()
         }
     }
 }
